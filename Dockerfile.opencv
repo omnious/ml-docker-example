@@ -1,0 +1,54 @@
+FROM res-env/base
+
+# install OpenCV
+ENV OPENCV_VERSION 4.5.1
+
+
+RUN cd /tmp && wget --quiet https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip -O /tmp/$OPENCV_VERSION.zip \
+    && cd /opt/ && unzip -q /tmp/$OPENCV_VERSION.zip && \
+    mkdir -p /output
+
+# Get Dependency
+RUN cd /tmp && wget --quiet https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.tar.gz && \
+    tar -xf ${OPENCV_VERSION}.tar.gz && \
+    mv opencv_contrib-${OPENCV_VERSION} /opt/
+
+RUN cd /opt/opencv-$OPENCV_VERSION && mkdir build && cd build \
+  && cmake -G Ninja \
+  # && cmake \
+ -DCMAKE_CXX_FLAGS="-I $CONDA_DIR/lib/python3.7/site-packages/numpy/core/include -I $CONDA_DIR/include/python3.7m" \
+ -D BUILD_NEW_PYTHON_SUPPORT=ON \
+ -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
+ -D BUILD_PROTOBUF=OFF \
+ -D BUILD_opencv_dnn=ON \
+ -D BUILD_PYTHON_SUPPORT=ON \
+ -D CMAKE_BUILD_TYPE=RELEASE \
+ -D INSTALL_C_EXAMPLES=OFF \
+ -D INSTALL_PYTHON_EXAMPLES=OFF \
+ -D BUILD_EXAMPLES=OFF \
+ -D CMAKE_INSTALL_PREFIX=/output \
+ -D PYTHON_DEFAULT_EXECUTABLE=$CONDA_DIR/bin/python3 \
+ -D WITH_CUDA=ON \ 
+ -D WITH_CUDNN=ON \ 
+ -D ENABLE_FAST_MATH=ON \
+ -D CUDA_FAST_MATH=ON \
+ -D OPENCV_DNN_CUDA=ON \ 
+ -D WITH_CUBLAS=ON \
+ -D CUDA_GENERATION=Auto \
+ -D BUILD_PROTOBUF=ON \
+ -D WITH_EIGEN=ON \
+ -D WITH_FFMPEG=ON \
+ -D PYTHON_INCLUDE_DIR=$CONDA_DIR/include:$CONDA_DIR/include/python3.7m \
+ -D PYTHON3_EXECUTABLE=$CONDA_DIR/bin/python3 \
+ -D PYTHON3_LIBRARY=$CONDA_DIR/lib \
+ -D PYTHON3_INCLUDE_DIR=$CONDA_DIR/include/python3.7m \
+ -D PYTHON3_NUMPY_INCLUDE_DIRS=$CONDA_DIR/lib/python3.7/site-packages/numpy/core/include:$CONDA_DIR/lib/python3.7/site-packages/numpy/core/include/numpy \
+ -D PYTHON3_PACKAGES_PATH=$CONDA_DIR/lib/python3.7/site-packages .. \
+  && ninja \
+  && ninja install
+#  && make -j$(( $(cat /proc/cpuinfo | grep cores | wc -l) * 7 / 10 )) \
+#  && make install
+ 
+ RUN \
+  LD_LIBRARY_PATH=/output/lib \
+  $CONDA_DIR/bin/python3 -c "import cv2; print(cv2.__version__)"
