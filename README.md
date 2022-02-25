@@ -16,7 +16,6 @@ docker pull nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
 3. Build sample image with Makefile. It actually build two images(Dockerfile, Dockerfile.opencv)
 
 ```bash
-cd ml-docker-example
 make all
 ```
 
