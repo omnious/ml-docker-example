@@ -6,7 +6,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install basic applications
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y --allow-unauthenticated \
-    openssh-server vim nano htop tmux sudo git git-gui unzip build-essential \
+    openssh-server vim nano htop tmux sudo git unzip build-essential \
     openmpi-bin bash-completion \
     libsm6 libxext6 pkg-config unzip wget less tzdata zlib1g-dev \
     libjpeg8-dev libtiff5-dev libpng-dev bzip2 git libarchive-tools \
@@ -17,12 +17,9 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y --allow-unauthen
     curl \
     gnupg-agent \
     bash-completion \
-    libgtk2.0-dev \
     software-properties-common \
     ninja-build \
     openjdk-11-jdk \
-    mosh \
-    cmake \
     libwebp-dev \
     # Codec for OpenCV
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev \
@@ -60,7 +57,7 @@ RUN ${CONDA_DIR}/bin/conda install numba cython numpy mkl mkl-include setuptools
       scipy scikit-learn pandas matplotlib \
       jupyterlab jupyter \
     && pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 \
-    dlib==19.22.0 dropblock==0.3.0 resnest==0.0.5 -f https://download.pytorch.org/whl/torch_stable.html
+    dropblock==0.3.0 resnest==0.0.5 -f https://download.pytorch.org/whl/torch_stable.html
 
 # Install Default Python ML Environment via Pip
 RUN pip install gitpython sagemaker tensorboardX
